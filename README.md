@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # face_recognition_system
 =======
 # Система распознавания лиц для видеонаблюдения
@@ -33,8 +33,3 @@
 ## Тестирование
 
 Запуск тестов: `python -m unittest discover tests`
-
-## Лицензия
-
-Свободное использование для образовательных целей.
->>>>>>> 33953f0 (Initial commit: face recognition system)
