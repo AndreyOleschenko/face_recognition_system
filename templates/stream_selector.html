@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Выбор камеры{% endblock %}
+{% block content %}
+<h1>Выберите камеру для просмотра</h1>
+<div class="cameras-grid">
+    {% for camera in cameras %}
+    <div class="camera-card">
+        <h3>{{ camera.name }}</h3>
+        <p><code>{{ camera.url }}</code></p>
+        <a href="{{ url_for('stream_view', camera_id=camera.id) }}" class="btn btn-primary">Смотреть</a>
+        <a href="{{ url_for('single_recognition', camera_id=camera.id) }}" class="btn btn-success">Разовое распознавание</a>
+    </div>
+    {% else %}
+    <p>Нет доступных камер. <a href="{{ url_for('cameras_page') }}">Добавьте камеру</a>.</p>
+    {% endfor %}
+</div>
+{% endblock %}

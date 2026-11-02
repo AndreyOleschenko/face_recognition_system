@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Система распознавания лиц{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+<body>
+    <header>
+        <div class="logo">FaceRecognition</div>
+        <nav>
+            <a href="{{ url_for('index') }}">Главная</a>
+            <a href="{{ url_for('cameras_page') }}">Камеры</a>
+            <a href="{{ url_for('add_person') }}">Добавить лицо</a>
+            <a href="{{ url_for('events_page') }}">События</a>
+            <a href="{{ url_for('stream_selector') }}">Видеопоток</a>
+        </nav>
+    </header>
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2026 Система распознавания лиц. ВКР Олещенко А.А.</p>
+    </footer>
+</body>
+</html>

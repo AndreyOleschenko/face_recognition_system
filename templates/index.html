@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+<h1>Панель мониторинга</h1>
+
+<div class="stats">
+    <div class="stat-card">
+        <h3>Известные люди</h3>
+        <p class="stat-value">{{ people_count }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Камер</h3>
+        <p class="stat-value">{{ cameras_count }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Событий</h3>
+        <p class="stat-value">{{ events_count }}</p>
+    </div>
+</div>
+
+<div class="auto-control">
+    <h2>Автоматическое распознавание</h2>
+    <form action="{{ url_for('toggle_auto_recognition') }}" method="post">
+        <select id="camera-source" class="form-input" title="Выберите источник камеры">
+            {% for camera in cameras %}
+                <option value="{{ camera.id }}">{{ camera.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn {% if auto_recognition %}btn-danger{% else %}btn-success{% endif %}">
+            {% if auto_recognition %}Остановить{% else %}Запустить{% endif %}
+        </button>
+    </form>
+    <span id="auto-recognition-status">Статус: {% if auto_recognition %}ВКЛ{% else %}ВЫКЛ{% endif %}</span>
+</div>
+
+<div class="two-columns">
+    <div class="column">
+        <h2>Последние события</h2>
+        <table class="events-table">
+            <thead>
+                <tr><th>Время</th><th>Камера</th><th>Лицо</th></tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>{{ event.timestamp }}</td>
+                    <td>{{ event.name }}</td>
+                    <td>
+                        {% if event.is_unknown %}
+                            <span class="unknown">Неизвестное</span>
+                        {% else %}
+                            {{ event.last_name }} {{ event.first_name }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="column">
+        <h2>Известные люди</h2>
+        <div class="faces-grid">
+            {% for person in people %}
+            <div class="face-card">
+                <img src="{{ url_for('serve_known_face', filename=person.image_path) }}" alt="{{ person.last_name }}">
+                <p>{{ person.last_name }} {{ person.first_name }}</p>
+                <a href="{{ url_for('delete_person', person_id=person.id) }}" class="btn-delete" onclick="return confirm('Удалить?')">Удалить</a>
+            </div>
+            {% else %}
+            <p>Нет известных людей. <a href="{{ url_for('add_person') }}">Добавить</a></p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

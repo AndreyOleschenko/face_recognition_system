@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Видеопоток - {{ camera.name }}{% endblock %}
+{% block content %}
+<h1>Видеопоток: {{ camera.name }}</h1>
+<div class="stream-info">
+    <p><strong>URL:</strong> {{ camera.url }}</p>
+    <p><strong>Статус:</strong> <span id="stream-status">Подключение...</span></p>
+</div>
+<div class="video-container">
+    <img src="{{ url_for('video_stream', camera_id=camera.id) }}" alt="Video Stream" id="video-feed" class="video-feed">
+</div>
+<div class="stream-controls">
+    <button onclick="captureFrame()" class="btn btn-primary">Сделать снимок</button>
+    <a href="{{ url_for('single_recognition', camera_id=camera.id) }}" class="btn btn-success">Разовое распознавание</a>
+    <button onclick="toggleStream()" class="btn btn-warning">Приостановить</button>
+</div>
+<div id="capture-result" style="display:none;">
+    <h3>Последний снимок:</h3>
+    <img id="captured-image" src="" alt="Снимок">
+</div>
+<script>
+    let streamPaused = false;
+    const videoFeed = document.getElementById('video-feed');
+    const statusSpan = document.getElementById('stream-status');
+
+    videoFeed.onerror = function() {
+        statusSpan.textContent = 'Ошибка подключения';
+        statusSpan.style.color = 'red';
+    };
+    videoFeed.onload = function() {
+        statusSpan.textContent = 'Подключено';
+        statusSpan.style.color = 'green';
+    };
+
+    function captureFrame() {
+        const canvas = document.createElement('canvas');
+        canvas.width = videoFeed.videoWidth || videoFeed.width;
+        canvas.height = videoFeed.videoHeight || videoFeed.height;
+        canvas.getContext('2d').drawImage(videoFeed, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        document.getElementById('captured-image').src = dataUrl;
+        document.getElementById('capture-result').style.display = 'block';
+        // Скачивание
+        const link = document.createElement('a');
+        link.download = 'capture_' + Date.now() + '.jpg';
+        link.href = dataUrl;
+        link.click();
+    }
+
+    function toggleStream() {
+        if (streamPaused) {
+            videoFeed.src = "{{ url_for('video_stream', camera_id=camera.id) }}";
+            streamPaused = false;
+            event.target.textContent = 'Приостановить';
+        } else {
+            videoFeed.src = "";
+            streamPaused = true;
+            event.target.textContent = 'Возобновить';
+        }
+    }
+</script>
+{% endblock %}

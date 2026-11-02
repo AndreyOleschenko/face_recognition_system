@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Экспорт событий за период{% endblock %}
+{% block content %}
+<h1>Экспорт событий за период</h1>
+<form method="post" action="{{ url_for('export_events_range') }}">
+    <div class="form-group">
+        <label for="start_date">Начальная дата</label>
+        <input type="date" id="start_date" name="start_date" value="{{ today }}" required>
+    </div>
+    <div class="form-group">
+        <label for="end_date">Конечная дата</label>
+        <input type="date" id="end_date" name="end_date" value="{{ today }}" required>
+    </div>
+    <button type="submit" class="btn btn-success">Экспортировать в CSV</button>
+    <a href="{{ url_for('events_page') }}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

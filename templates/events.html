@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Журнал событий{% endblock %}
+{% block content %}
+<h1>Журнал событий</h1>
+
+<div class="filters">
+    <label>Камера: <select id="filter-camera">
+        <option value="">Все</option>
+        {% for camera in cameras %}
+        <option value="{{ camera.id }}">{{ camera.name }}</option>
+        {% endfor %}
+    </select></label>
+    <label>Тип: <select id="filter-unknown">
+        <option value="">Все</option>
+        <option value="0">Известные</option>
+        <option value="1">Неизвестные</option>
+    </select></label>
+    <button id="apply-filters" class="btn btn-primary">Применить</button>
+    <a href="{{ url_for('export_events') }}" class="btn btn-success">Экспорт всех в CSV</a>
+</div>
+
+<table id="events-table" class="events-table">
+    <thead>
+        <tr><th>Время</th><th>Камера</th><th>Лицо</th><th>Уверенность</th><th>Изображение</th></tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<div id="pagination">
+    <button id="prev-page" disabled>← Предыдущая</button>
+    <span id="page-info">Страница 1</span>
+    <button id="next-page">Следующая →</button>
+</div>
+
+<script>
+    let currentPage = 0;
+    const limit = 50;
+
+    function loadEvents() {
+        const camera = document.getElementById('filter-camera').value;
+        const unknown = document.getElementById('filter-unknown').value;
+        let url = `/api/events?limit=${limit}&offset=${currentPage * limit}`;
+        if (camera) url += `&camera_id=${camera}`;
+        if (unknown !== '') url += `&is_unknown=${unknown}`;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.querySelector('#events-table tbody');
+                tbody.innerHTML = '';
+                data.events.forEach(e => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${e.display_time}</td>
+                        <td>${e.camera_name}</td>
+                        <td>${e.is_unknown ? 'Неизвестное лицо' : (e.last_name + ' ' + e.first_name)}</td>
+                        <td>${e.confidence ? e.confidence.toFixed(2) : ''}</td>
+                        <td>${e.image_path ? '<img src="/unknown_faces/' + e.image_path + '" width="50">' : ''}</td>
+                    `;
+                });
+                document.getElementById('page-info').textContent = `Страница ${currentPage+1}`;
+                document.getElementById('prev-page').disabled = currentPage === 0;
+                document.getElementById('next-page').disabled = (currentPage+1)*limit >= data.total;
+            });
+    }
+
+    document.getElementById('apply-filters').addEventListener('click', () => {
+        currentPage = 0;
+        loadEvents();
+    });
+    document.getElementById('prev-page').addEventListener('click', () => {
+        currentPage--;
+        loadEvents();
+    });
+    document.getElementById('next-page').addEventListener('click', () => {
+        currentPage++;
+        loadEvents();
+    });
+
+    loadEvents();
+</script>
+{% endblock %}

@@ -1,0 +1,39 @@
+# Виртуальные окружения
+venv/
+venv39/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Базы данных
+*.db
+database/
+database.db
+
+# Персональные данные и лица
+faces/
+known_faces/
+unknown_faces/
+static/temp/
+exports/
+
+# Ключи и сертификаты
+*.pem
+key.pem
+cert.pem
+
+# Логи и архивы
+*.xlsx
+*.tar.gz
+
+# Секреты/конфиги с паролями (если есть)
+.env
+config.local.py
+
+# ОС
+.DS_Store
+Thumbs.db
